@@ -1,0 +1,10 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/picker/picker",
+    "pages/list/list"
+  ],
+  "window": {
+    "defaultTitle": "测试App"
+  }
+}
