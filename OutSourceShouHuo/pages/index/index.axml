@@ -1,0 +1,72 @@
+<import src="../../pages/list/list.axml" />
+<view class="page">
+ 
+  <view class="page-section">
+    <picker onChange="bindLydChange" onTap="getLyd" value="{{lydIndex}}" range="{{lydArray}}" range-key="Name">
+      <view class="row">
+        <view class="row-title">委外商                        
+        </view>
+        <view class="row-extra">{{lydArray[lydIndex].Name}}                        
+        </view>
+        <image class="row-arrow" src="/image/arrowright.png" mode="aspectFill" />
+      </view>
+    </picker>
+  </view>
+  <view class="page-section">
+    <picker onChange="bindPickerChange" onTap="getCategory" value="{{categoryIndex}}" range="{{categoryArray}}" range-key="CategoryName">
+      <view class="row">
+        <view class="row-title">类别                        
+        </view>
+        <view class="row-extra">{{categoryArray[categoryIndex].CategoryName}}                        
+        </view>
+        <image class="row-arrow" src="/image/arrowright.png" mode="aspectFill" />
+      </view>
+    </picker>
+  </view>
+  <view class="page-section">
+    <picker onChange="bindObjPickerChange" value="{{goodsIndex}}" range="{{goodsArray}}" range-key="FullName">
+      <view class="row">
+        <view class="row-title">品名                        
+        </view>
+        <view class="row-extra">{{goodsArray[goodsIndex].FullName}}                        
+        </view>
+        <image class="row-arrow" src="/image/arrowright.png" mode="aspectFill" />
+      </view>
+    </picker>
+  </view>
+  <view class="page-section">
+    <view class="form-row">
+      <view class="form-row-label">件数                  
+      </view>
+      <view class="form-row-content">
+        <input class="input" type="number" placeholder="输入件数" onInput="bindQtyKeyInput" value="{{qtyValue}}"/>
+      </view>
+    </view>
+  </view>
+  <button type="primary" onTap="addList">添加    
+  </button>
+  <view class="page-section">
+    <!-- <view class="page-section-title">报工列表 
+    </view> -->
+    <view class="page-section-demo">
+      <scroll-view scroll-y="{{true}}" style="height: 300px;" onScrollToUpper="upper" onScrollToLower="lower" onScroll="scroll" scroll-into-view="{{toView}}" scroll-top="{{scrollTop}}">
+        <!-- <list><block a:for="{{items}}"><list-item key="item-{{index}}" index="{{index}}" last="{{index === (items.length - 1)}}">      {{item.title}}                                  
+              <view class="am-list-brief" onTap="tapName">{{item.brief}}                            
+              </view></list-item></block></list> -->
+        <view a:for="{{list}}" key="{{list.content}}">
+          <swipe-action index="{{index}}" restore="{{swipeIndex === null || swipeIndex !== index}}" right="{{item.right}}" onRightItemClick="onRightItemClick" onSwipeStart="onSwipeStart" extra="item{{index}}">
+            <list-item arrow="horizontal" index="{{index}}" key="items-{{index}}"  last="{{index === list.length - 1}}">          {{item.content.GoodsName}} 
+                  <view class="am-list-brief" >{{item.content.Qty2}}                   
+            </list-item>
+            
+          </swipe-action>
+        </view>
+      </scroll-view>
+    </view>
+  </view>
+  <view>
+    <button type="primary" class="submit" size="" onTap="submitList"> 提交           
+    </button>
+    <!-- <view class="row">CorpId:{{corpId}}</view><view hidden="{{hideList}}"><view class="row">AuthCode:{{authCode}}</view><view class="row">userId:{{userId}}</view><view class="row">name:{{userName}}</view></view> -->
+  </view>
+</view>

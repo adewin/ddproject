@@ -6,8 +6,8 @@ const app = getApp();
 // https://open-doc.dingtalk.com/microapp/debug/ucof2g
 //替换成开发者后台设置的安全域名
 // let domain = "http://192.198.1.111:19433";
-// let domain = "http://47.92.34.191:8888";
-let domain = "http://101.37.27.118:6060";
+let domain = "http://47.92.34.191:8888";
+// let domain = "http://101.37.27.118:6060";
 let url = domain + '/login/GetUserInfo';
 
 

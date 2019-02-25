@@ -6,8 +6,8 @@ const app = getApp();
 // https://open-doc.dingtalk.com/microapp/debug/ucof2g
 //替换成开发者后台设置的安全域名
 // let domain = "http://192.198.1.111:19433";
-// let domain = "http://47.92.34.191:8888";
-let domain = "http://101.37.27.118:6060";
+let domain = "http://47.92.34.191:8888";
+// let domain = "http://101.37.27.118:6060";
 let url = domain + '/login/GetUserInfo';
 
 
@@ -41,11 +41,11 @@ Page({
 
     ],
 
-    inTypeArray: [{ Id: 1, Name: '外购' }, { Id: 2, Name: '调入' }, { Id: 3, Name: '自产' }, { Id: 4, Name: '车间退回' }, { Id: 5, Name: '盘盈' }],//入库类别数组
+   
     lydArray: [],//来源地
     categoryArray: [],//分类数组
     goodsArray: [],//品名数组
-    inIndex: 0,
+ 
     lydIndex: 0,
     categoryIndex: 0,
     goodsIndex: 0
@@ -57,7 +57,8 @@ Page({
     console.info(`Page onLoad with query: ${JSON.stringify(query)}`);
     let _this = this;
     this.loginSystem();
-    this.getLyd();
+    // this.getLyd();
+    this.getSupplier();//获取委外商
     this.setData({
       corpId: app.globalData.corpId
     });
@@ -167,14 +168,17 @@ Page({
 
   },
 
-    //来源地
-  getLyd() {
+  
+
+
+    //委外商
+  getSupplier() {
     // console.log("getCategory_userId---", JSON.stringify(userId));
     dd.httpRequest({
-      url: domain + "/DingTalkManage/CottonYarn/GetLydList",
+      url: domain + "/DingTalkManage/CottonYarn/GetOutSupplierList",
       method: 'get',
       data: {
-        "EnCode": 'ProductPlace'
+       
       },
       dataType: 'jsonp',
       success: (res) => {
@@ -184,17 +188,17 @@ Page({
         if (resdata.type == 3) {
           dd.alert({ content: JSON.stringify(resdata.message) });
         }
-        // var obj = {};
-        // obj.Id = 0;
-        // obj.Name = "常用";
+         var obj = {};
+         obj.Id = "";
+         obj.Name = "";
         let objData = this.data.lydArray;
-        // objData.push(obj);
+         objData.push(obj);
         for (var i = 0; i < resdata.length; i++) {
-          var obj = {};
-          obj.Id = resdata[i].ItemValue;
-          obj.Name = resdata[i].ItemName;
+          var obj1 = {};
+          obj1.Id = resdata[i].ID;
+          obj1.Name = resdata[i].FullName;
           // let objData = this.data.lydArray;
-          objData.push(obj);
+          objData.push(obj1);
 
         }
 
@@ -235,8 +239,8 @@ Page({
           dd.alert({ content: JSON.stringify(resdata.message) });
         }
         var obj = {};
-        obj.Id = 0;
-        obj.CategoryName = "常用";
+         obj.Id = "";
+         obj.CategoryName = "";
         let objData = this.data.categoryArray;
         objData.push(obj);
         for (var i = 0; i < resdata.length; i++) {
@@ -296,13 +300,7 @@ Page({
   },
 
 
- //入库类型选中事件
-  bindInTypeChange(e) {
-    // console.log('picker发送选择改变，携带值为', e.detail.value);
-    this.setData({
-      inIndex: e.detail.value,
-    });
-  },
+ 
 
    //来源地选中事件
   bindLydChange(e) {
@@ -344,10 +342,11 @@ Page({
 
     obj.right = this.data.right;
     obj.content = {
-      GoodsName: this.data.goodsArray[this.data.goodsIndex].FullName,
-      Qty: this.data.qtyValue,
       CategoryId: this.data.categoryArray[this.data.categoryIndex].Id,
-      GoodsId: this.data.goodsArray[this.data.goodsIndex].ID
+      OutSourceSupplier:this.data.lydArray[this.data.lydIndex].Id,
+      GoodsId: this.data.goodsArray[this.data.goodsIndex].ID,
+      GoodsName: this.data.goodsArray[this.data.goodsIndex].FullName,
+      Qty2: this.data.qtyValue,
     };
     if (obj.content.Qty == '') {
       dd.alert({ content: "请输入件数" });
@@ -365,33 +364,18 @@ Page({
   //按钮提交事件
   submitList() {
     var entityJson = {};
-    entityJson.SellerId = this.data.userId;
-    entityJson.WarehouseType = this.data.inTypeArray[this.data.inIndex].Name;
-    entityJson.PlaceName = this.data.lydArray[this.data.lydIndex].Name;
-        let url="";//路径
-        if (entityJson.WarehouseType=="外购") {
-           url="/DingTalkManage/CottonYarn/SavePurchaseEntryInForm"; //采购入库单
-         }
-         if (entityJson.WarehouseType=="调入") {
-           url="/DingTalkManage/CottonYarn/SaveOtherWarehouseInForm";//其他入库单
-         }
-         if (entityJson.WarehouseType=="自产") {
-           url="/DingTalkManage/CottonYarn/SaveProductStorageLoomForm"; //生产入库单
-         }
-         if (entityJson.WarehouseType=="车间退回") {
-           url="/DingTalkManage/CottonYarn/SaveOtherWarehouseInForm";//其他入库单
-         }
-         if(entityJson.WarehouseType=="盘盈"){
-           url="/DingTalkManage/CottonYarn/SaveOtherWarehouseInForm";//其他入库
-         }
-
+   
+    entityJson.OutSourceSupplier = this.data.lydArray[this.data.lydIndex].Id;
+    let url="/DingTalkManage/CottonYarn/SaveOutSourceReceiveForm";//委外收货    路径
+       
     let items = [];
     let childEntryJson = [];
     this.data.list.forEach(function (item) {
       childEntryJson.push(item.content);
     });
+    
     if (childEntryJson.length == 0) {
-      dd.alert({ content: '请添加出库数据' });
+      dd.alert({ content: '请添加收货数据' });
       return;
     }
     my.confirm({
@@ -403,15 +387,7 @@ Page({
       success: (result) => {
         const { list } = this.data;
         if (result.confirm) {
-          // let items = [];
-          // let childEntryJson = [];
-          // list.forEach(function (item) {
-          //   childEntryJson.push(item.content);
-          // });
-          // if(childEntryJson.length==0){
-          //      dd.alert({ content: '请添加提报数据'});
-          //      return;
-          // }
+         
           dd.httpRequest({
             url: domain + url,
             method: 'post',

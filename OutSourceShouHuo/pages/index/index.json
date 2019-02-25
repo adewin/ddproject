@@ -1,0 +1,8 @@
+{
+  "defaultTitle": "委外收货",
+  "usingComponents":{
+  "list":"mini-ddui/es/list/index",
+  "list-item":"mini-ddui/es/list/list-item/index",
+  "swipe-action":"mini-ddui/es/swipe-action/index"
+  }
+}
